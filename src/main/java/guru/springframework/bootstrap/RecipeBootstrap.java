@@ -60,17 +60,15 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         Ingredient avocados = new Ingredient();
         avocados.setDescription("ripe avocados");
         avocados.setAmount(new BigDecimal(2));
-        avocados.setRecipe(guacamole);
 
 
         Ingredient salt = new Ingredient();
         salt.setDescription("of salt, more to taste");
         salt.setAmount(new BigDecimal(1/4));
         salt.setUnitOfMeasure(teaspoon);
-        salt.setRecipe(guacamole);
 
-        guacamole.getIngredients().add(avocados);
-        guacamole.getIngredients().add(salt);
+        guacamole.addIngredient(avocados);
+        guacamole.addIngredient(salt);
 
         recipeRepository.save(guacamole);
     }
