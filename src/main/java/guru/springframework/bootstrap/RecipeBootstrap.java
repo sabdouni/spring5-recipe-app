@@ -29,6 +29,7 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         UnitOfMeasure teaspoon = unitOfMeasureRepository.findByDescription("Teaspoon").get();
         UnitOfMeasure tablespoon = unitOfMeasureRepository.findByDescription("Tablespoon").get();
         UnitOfMeasure dash = unitOfMeasureRepository.findByDescription("Dash").get();
+        UnitOfMeasure each = unitOfMeasureRepository.findByDescription("Each").get();
 
         //Categories
         Category american = categoryRepository.findByDescription("American").get();
@@ -60,11 +61,11 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         Ingredient avocados = new Ingredient();
         avocados.setDescription("ripe avocados");
         avocados.setAmount(new BigDecimal(2));
-
+        avocados.setUnitOfMeasure(each);
 
         Ingredient salt = new Ingredient();
-        salt.setDescription("of salt, more to taste");
-        salt.setAmount(new BigDecimal(1/4));
+        salt.setDescription("salt, more to taste");
+        salt.setAmount(new BigDecimal(0.25));
         salt.setUnitOfMeasure(teaspoon);
 
         guacamole.addIngredient(avocados);

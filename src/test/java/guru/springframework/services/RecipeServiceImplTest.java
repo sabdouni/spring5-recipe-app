@@ -41,7 +41,25 @@ public class RecipeServiceImplTest {
         //Assert
         assertEquals(recipesData, recipes);
         verify(recipeRepository, times(1)).findAll();
+        verify(recipeRepository, never()).findById(anyLong());
 
     }
 
+
+    @Test
+    public void findById() {
+        //Arrange
+        Recipe recipe = new Recipe();
+
+        when(recipeRepository.findById(anyLong())).thenReturn(java.util.Optional.of(recipe));
+
+        //Act
+        Recipe result = recipeService.findById(1L);
+
+        //Assert
+        assertEquals(recipe, result);
+        verify(recipeRepository, never()).findAll();
+        verify(recipeRepository, times(1)).findById(anyLong());
+
+    }
 }
