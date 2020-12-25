@@ -83,7 +83,7 @@ public class RecipeServiceImplTest {
 
         when(recipeCommandToRecipe.convert(any(RecipeCommand.class))).thenReturn(recipe);
         when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
-
+ 
         //Act
         RecipeCommand result = recipeService.save(recipeCommand);
 

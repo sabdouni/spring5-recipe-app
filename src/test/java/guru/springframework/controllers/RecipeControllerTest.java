@@ -136,4 +136,17 @@ public class RecipeControllerTest {
         assertEquals(RECIPE_DESCRIPTION, requestCaptor.getValue().getDirections());
         assertEquals(RECIPE_NOTES, requestCaptor.getValue().getNotes().getRecipeNotes());
     }
+
+    @Test
+    public void testDeleteRecipe() throws Exception {
+        //Arrange
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/" + RECIPE_ID + "/delete"));
+
+        //Assert
+        verify(recipeService, times(1)).deleteById(eq(RECIPE_ID));
+        resultActions.andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
 }
