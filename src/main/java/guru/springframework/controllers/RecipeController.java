@@ -4,10 +4,7 @@ import guru.springframework.commands.RecipeCommand;
 import guru.springframework.services.RecipeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/recipe")
 @Controller
@@ -19,6 +16,7 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
+    @GetMapping
     @RequestMapping("/{id}/show")
     public String show(@PathVariable Long id, Model model) {
         RecipeCommand recipe = recipeService.findById(id);
@@ -26,6 +24,7 @@ public class RecipeController {
         return "recipe/show";
     }
 
+    @GetMapping
     @RequestMapping("/{id}/update")
     public String update(@PathVariable Long id, Model model) {
         RecipeCommand recipe = recipeService.findById(id);
@@ -33,12 +32,14 @@ public class RecipeController {
         return "recipe/new";
     }
 
+    @GetMapping
     @RequestMapping("/{id}/delete")
     public String delete(@PathVariable Long id) {
         recipeService.deleteById(id);
         return "redirect:/";
     }
-
+    
+    @GetMapping
     @RequestMapping("/new")
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
