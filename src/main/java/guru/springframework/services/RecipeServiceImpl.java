@@ -50,4 +50,14 @@ public class RecipeServiceImpl implements RecipeService {
 
         return recipeToRecipeCommand.convert(savedRecipe);
     }
+
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        Optional<Recipe> optionalRecipe = recipeRepository.findById(id);
+        if (!optionalRecipe.isPresent()) {
+            throw new RuntimeException("Recipe not found");
+        }
+        recipeRepository.deleteById(id);
+    }
 }

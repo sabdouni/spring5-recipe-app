@@ -92,4 +92,17 @@ public class RecipeServiceImplTest {
         verify(recipeRepository, times(1)).save(any(Recipe.class));
         verify(recipeToRecipeCommand, times(1)).convert(any(Recipe.class));
     }
+
+    @Test
+    public void testDeleteById() {
+        //Arrange
+        Recipe recipe = new Recipe();
+        when(recipeRepository.findById(anyLong())).thenReturn(java.util.Optional.of(recipe));
+
+        //Act
+        recipeService.deleteById(1L);
+
+        //Assert
+        verify(recipeRepository, times(1)).deleteById(eq(1L));
+    }
 }
