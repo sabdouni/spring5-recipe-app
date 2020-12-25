@@ -1,5 +1,8 @@
 package guru.springframework.services;
 
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.converters.RecipeCommandToRecipe;
+import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
 import org.junit.Before;
@@ -10,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class RecipeServiceImplTest {
@@ -20,10 +23,17 @@ public class RecipeServiceImplTest {
     @Mock
     private RecipeRepository recipeRepository;
 
+    @Mock
+    private RecipeCommandToRecipe recipeCommandToRecipe;
+
+    @Mock
+    private RecipeToRecipeCommand recipeToRecipeCommand;
+
+
     @Before
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.initMocks(this);
-        recipeService = new RecipeServiceImpl(recipeRepository);
+        recipeService = new RecipeServiceImpl(recipeRepository, recipeCommandToRecipe, recipeToRecipeCommand);
     }
 
     @Test
@@ -60,6 +70,24 @@ public class RecipeServiceImplTest {
         assertEquals(recipe, result);
         verify(recipeRepository, never()).findAll();
         verify(recipeRepository, times(1)).findById(anyLong());
+    }
 
+    @Test
+    public void save() {
+        //Arrange
+        RecipeCommand recipeCommand = new RecipeCommand();
+
+        Recipe recipe = new Recipe();
+
+        when(recipeCommandToRecipe.convert(any(RecipeCommand.class))).thenReturn(recipe);
+        when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
+
+        //Act
+        RecipeCommand result = recipeService.save(recipeCommand);
+
+        //Assert
+        verify(recipeCommandToRecipe, times(1)).convert(any(RecipeCommand.class));
+        verify(recipeRepository, times(1)).save(any(Recipe.class));
+        verify(recipeToRecipeCommand, times(1)).convert(any(Recipe.class));
     }
 }
