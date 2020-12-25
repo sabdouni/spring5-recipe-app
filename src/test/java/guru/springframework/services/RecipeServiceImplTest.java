@@ -60,14 +60,16 @@ public class RecipeServiceImplTest {
     public void findById() {
         //Arrange
         Recipe recipe = new Recipe();
+        RecipeCommand recipeCommand = new RecipeCommand();
 
         when(recipeRepository.findById(anyLong())).thenReturn(java.util.Optional.of(recipe));
+        when(recipeToRecipeCommand.convert(any(Recipe.class))).thenReturn(recipeCommand);
 
         //Act
-        Recipe result = recipeService.findById(1L);
+        RecipeCommand result = recipeService.findById(1L);
 
         //Assert
-        assertEquals(recipe, result);
+        assertEquals(recipeCommand, result);
         verify(recipeRepository, never()).findAll();
         verify(recipeRepository, times(1)).findById(anyLong());
     }

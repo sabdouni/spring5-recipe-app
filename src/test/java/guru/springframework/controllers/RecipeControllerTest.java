@@ -2,7 +2,6 @@ package guru.springframework.controllers;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.domain.Difficulty;
-import guru.springframework.domain.Recipe;
 import guru.springframework.services.RecipeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,9 +53,9 @@ public class RecipeControllerTest {
     }
 
     @Test
-    public void showRecipe() throws Exception {
+    public void testShowRecipeView() throws Exception {
         //Arrange
-        Recipe recipe = new Recipe();
+        RecipeCommand recipe = new RecipeCommand();
         when(recipeService.findById(anyLong())).thenReturn(recipe);
 
         //Act
@@ -70,7 +69,7 @@ public class RecipeControllerTest {
     }
 
     @Test
-    public void newRecipe() throws Exception {
+    public void testNewRecipeView() throws Exception {
         //Arrange
 
         //Act
@@ -83,7 +82,26 @@ public class RecipeControllerTest {
     }
 
     @Test
-    public void saveOrUpdateRecipe() throws Exception {
+    public void testUpdateRecipeView() throws Exception {
+        //Arrange
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(RECIPE_ID);
+
+        when(recipeService.findById(eq(RECIPE_ID))).thenReturn(recipeCommand);
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/" + RECIPE_ID + "/update"));
+
+        //Assert
+        verify(recipeService, times(1)).findById(eq(RECIPE_ID));
+
+        resultActions.andExpect(model().attributeExists("recipe"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("recipe/new"));
+    }
+
+    @Test
+    public void testSaveOrUpdateRecipe() throws Exception {
         //Arrange
         RecipeCommand recipeCommand = new RecipeCommand();
         recipeCommand.setId(RECIPE_ID);
