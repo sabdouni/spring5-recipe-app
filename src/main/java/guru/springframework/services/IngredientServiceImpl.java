@@ -5,6 +5,7 @@ import guru.springframework.converters.IngredientCommandToIngredient;
 import guru.springframework.converters.IngredientToIngredientCommand;
 import guru.springframework.domain.Ingredient;
 import guru.springframework.domain.Recipe;
+import guru.springframework.repositories.IngredientRepository;
 import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,9 @@ import java.util.Optional;
 @Service
 @Transactional(readOnly = true)
 public class IngredientServiceImpl implements IngredientService {
+
+    private final IngredientRepository ingredientRepository;
+
     private final RecipeRepository recipeRepository;
 
     private final IngredientToIngredientCommand ingredientToIngredientCommand;
@@ -24,7 +28,8 @@ public class IngredientServiceImpl implements IngredientService {
 
     private final UnitOfMeasureRepository unitOfMeasureRepository;
 
-    public IngredientServiceImpl(RecipeRepository recipeRepository, IngredientToIngredientCommand ingredientToIngredientCommand, IngredientCommandToIngredient ingredientCommandToIngredient, UnitOfMeasureRepository unitOfMeasureRepository) {
+    public IngredientServiceImpl(IngredientRepository ingredientRepository, RecipeRepository recipeRepository, IngredientToIngredientCommand ingredientToIngredientCommand, IngredientCommandToIngredient ingredientCommandToIngredient, UnitOfMeasureRepository unitOfMeasureRepository) {
+        this.ingredientRepository = ingredientRepository;
         this.recipeRepository = recipeRepository;
         this.ingredientToIngredientCommand = ingredientToIngredientCommand;
         this.ingredientCommandToIngredient = ingredientCommandToIngredient;
@@ -66,23 +71,22 @@ public class IngredientServiceImpl implements IngredientService {
                 .filter(ingredient -> ObjectUtils.nullSafeEquals(ingredient.getId(), ingredientCommand.getId()))
                 .findFirst();
 
+        Ingredient ingredientToUpdateOrCreate;
+
         if (optionalIngredient.isPresent()) {
-            Ingredient ingredientToUpdate = optionalIngredient.get();
-            ingredientToUpdate.setDescription(ingredientCommand.getDescription());
-            ingredientToUpdate.setAmount(ingredientCommand.getAmount());
-            ingredientToUpdate.setUnitOfMeasure(unitOfMeasureRepository
+            ingredientToUpdateOrCreate = optionalIngredient.get();
+            ingredientToUpdateOrCreate.setDescription(ingredientCommand.getDescription());
+            ingredientToUpdateOrCreate.setAmount(ingredientCommand.getAmount());
+            ingredientToUpdateOrCreate.setUnitOfMeasure(unitOfMeasureRepository
                     .findById(ingredientCommand.getUnitOfMeasure().getId())
                     .orElseThrow(() -> new RuntimeException("UnitOfMeasur not found:" + ingredientCommand.getUnitOfMeasure().getId())));
         } else {
-            Ingredient ingredientToCreate = ingredientCommandToIngredient.convert(ingredientCommand);
-            detachedRecipe.addIngredient(ingredientToCreate);
+            ingredientToUpdateOrCreate = ingredientCommandToIngredient.convert(ingredientCommand);
+            ingredientToUpdateOrCreate.setRecipe(detachedRecipe);
         }
 
-        Recipe savedRecipe = recipeRepository.save(detachedRecipe);
+        Ingredient ingredientSaved = ingredientRepository.save(ingredientToUpdateOrCreate);
 
-        return ingredientToIngredientCommand.convert(savedRecipe.getIngredients().stream()
-                .filter(ingredient -> ObjectUtils.nullSafeEquals(ingredient.getId(), ingredientCommand.getId()))
-                .findFirst()
-                .get());
+        return ingredientToIngredientCommand.convert(ingredientSaved);
     }
 }
