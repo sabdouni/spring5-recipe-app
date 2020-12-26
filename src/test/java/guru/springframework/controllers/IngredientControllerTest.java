@@ -91,7 +91,7 @@ public class IngredientControllerTest {
     }
 
     @Test
-    public void testShowUpdateIngredientDetailsView() throws Exception {
+    public void testShowIngredientUpdateDetailsView() throws Exception {
         //Arrange
         IngredientCommand ingredientCommand = new IngredientCommand();
 
@@ -114,6 +114,32 @@ public class IngredientControllerTest {
                 .andExpect(model().attributeExists("ingredient"))
                 .andExpect(model().attributeExists("listOfUoms"))
                 .andExpect(model().attributeExists("recipeId"));
+
+        verify(unitOfMeasureService, times(1)).findAll();
+    }
+
+    @Test
+    public void testShowIngredientCreationView() throws Exception {
+        //Arrange
+        Set<UnitOfMeasureCommand> unitOfMeasures = new HashSet<>();
+        UnitOfMeasureCommand unitOfMeasureCommand = new UnitOfMeasureCommand();
+        unitOfMeasureCommand.setId(UOM_ID);
+        unitOfMeasures.add(unitOfMeasureCommand);
+
+        when(unitOfMeasureService.findAll()).thenReturn(unitOfMeasures);
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/" + RECIPE_ID + "/ingredients/new"));
+
+        //Assert
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(view().name("recipe/ingredient/new"))
+                .andExpect(model().attributeExists("ingredient"))
+                .andExpect(model().attributeExists("listOfUoms"))
+                .andExpect(model().attributeExists("recipeId"));
+
+        verify(unitOfMeasureService, times(1)).findAll();
     }
 
     @Test
