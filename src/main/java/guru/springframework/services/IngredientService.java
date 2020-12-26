@@ -4,4 +4,6 @@ import guru.springframework.commands.IngredientCommand;
 
 public interface IngredientService {
     IngredientCommand findByRecipeIdAndIngredientId(Long recipeId, Long id);
+
+    IngredientCommand save(Long recipeId, IngredientCommand ingredientCommand);
 }
