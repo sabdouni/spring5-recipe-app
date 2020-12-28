@@ -4,7 +4,10 @@ import guru.springframework.commands.RecipeCommand;
 import guru.springframework.services.RecipeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 public class RecipeController {
@@ -15,38 +18,33 @@ public class RecipeController {
         this.recipeService = recipeService;
     }
 
-    @GetMapping
-    @RequestMapping("/recipe/{id}/show")
+    @GetMapping("/recipe/{id}/show")
     public String show(@PathVariable Long id, Model model) {
         RecipeCommand recipe = recipeService.findById(id);
         model.addAttribute("recipe", recipe);
         return "recipe/show";
     }
 
-    @GetMapping
-    @RequestMapping("/recipe/{id}/update")
+    @GetMapping("/recipe/{id}/update")
     public String update(@PathVariable Long id, Model model) {
         RecipeCommand recipe = recipeService.findById(id);
         model.addAttribute("recipe", recipe);
         return "recipe/new";
     }
 
-    @GetMapping
-    @RequestMapping("/recipe/{id}/delete")
+    @GetMapping("/recipe/{id}/delete")
     public String delete(@PathVariable Long id) {
         recipeService.deleteById(id);
         return "redirect:/";
     }
 
-    @GetMapping
-    @RequestMapping("/recipe/new")
+    @GetMapping("/recipe/new")
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
         return "recipe/new";
     }
 
-    @PostMapping
-    @RequestMapping("/recipe")
+    @PostMapping("/recipe")
     public String saveOrUpdate(@ModelAttribute RecipeCommand recipeCommand) {
         RecipeCommand savedRecipeCommand = recipeService.save(recipeCommand);
         return "redirect:/recipe/" + savedRecipeCommand.getId() + "/show";
