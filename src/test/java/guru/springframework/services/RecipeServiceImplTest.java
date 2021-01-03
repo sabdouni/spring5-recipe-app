@@ -7,9 +7,12 @@ import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -17,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class RecipeServiceImplTest {
+
+    private static final Long RECIPE_ID = 1L;
 
     private RecipeServiceImpl recipeService;
 
@@ -83,7 +88,7 @@ public class RecipeServiceImplTest {
 
         when(recipeCommandToRecipe.convert(any(RecipeCommand.class))).thenReturn(recipe);
         when(recipeRepository.save(any(Recipe.class))).thenReturn(recipe);
- 
+
         //Act
         RecipeCommand result = recipeService.save(recipeCommand);
 
@@ -104,5 +109,23 @@ public class RecipeServiceImplTest {
 
         //Assert
         verify(recipeRepository, times(1)).deleteById(eq(1L));
+    }
+
+    @Test
+    public void testUploadImageById() throws IOException {
+        //Arrange
+        Recipe recipe = new Recipe();
+        recipe.setId(RECIPE_ID);
+        when(recipeRepository.findById(anyLong())).thenReturn(java.util.Optional.of(recipe));
+
+        MockMultipartFile file = new MockMultipartFile("imagefine", "testing.txt", "text/plain", "Some Image Mock".getBytes());
+
+        ArgumentCaptor<Recipe> argumentCaptor = ArgumentCaptor.forClass(Recipe.class);
+        //Act
+        recipeService.uploadImageById(RECIPE_ID, file);
+
+        //Assert
+        verify(recipeRepository, times(1)).save(argumentCaptor.capture());
+        assertEquals(file.getBytes().length, argumentCaptor.getValue().getImage().length);
     }
 }

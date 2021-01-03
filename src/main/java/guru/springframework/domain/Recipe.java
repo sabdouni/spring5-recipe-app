@@ -10,7 +10,7 @@ import java.util.Set;
 @Entity
 public class Recipe {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String description;
@@ -23,20 +23,20 @@ public class Recipe {
     @Lob
     private String directions;
 
-    @OneToMany(cascade=CascadeType.ALL, mappedBy="recipe")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recipe")
     private Set<Ingredient> ingredients = new HashSet<>();
 
     @Lob
     private Byte[] image;
 
-    @Enumerated(value=EnumType.STRING)
+    @Enumerated(value = EnumType.STRING)
     private Difficulty difficulty;
 
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private Notes notes;
 
     @ManyToMany
-    @JoinTable(name="recipe_category", joinColumns=@JoinColumn(name="recipe_id"), inverseJoinColumns = @JoinColumn(name="category_id"))
+    @JoinTable(name = "recipe_category", joinColumns = @JoinColumn(name = "recipe_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<Category> categories = new HashSet<>();
 
     public void setNotes(Notes notes) {
@@ -44,7 +44,7 @@ public class Recipe {
         this.notes = notes;
     }
 
-    public void addIngredient(Ingredient ingredient){
+    public void addIngredient(Ingredient ingredient) {
         ingredient.setRecipe(this);
         ingredients.add(ingredient);
     }

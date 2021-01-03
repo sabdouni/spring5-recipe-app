@@ -9,15 +9,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 public class RecipeControllerTest {
@@ -148,5 +149,38 @@ public class RecipeControllerTest {
         verify(recipeService, times(1)).deleteById(eq(RECIPE_ID));
         resultActions.andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/"));
+    }
+
+
+    @Test
+    public void testShowUploadRecipeImageView() throws Exception {
+        //Arrange
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(RECIPE_ID);
+
+        when(recipeService.findById(eq(RECIPE_ID))).thenReturn(recipeCommand);
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/" + RECIPE_ID + "/image"));
+
+        //Assert
+        resultActions.andExpect(status().isOk())
+                .andExpect(view().name("recipe/uploadimage"))
+                .andExpect(model().attributeExists("recipe"));
+    }
+
+    @Test
+    public void testUploadRecipeImage() throws Exception {
+        //Arrange
+
+        MockMultipartFile file = new MockMultipartFile("imagefile", "testing.text", MediaType.TEXT_PLAIN_VALUE, "An image".getBytes());
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(multipart("/recipe/" + RECIPE_ID + "/image").file(file));
+
+        //Assert
+        resultActions.andExpect(status().is3xxRedirection())
+                .andExpect(header().string("Location", "/recipe/" + RECIPE_ID + "/show"));
+        verify(recipeService, times(1)).uploadImageById(eq(RECIPE_ID), any(MultipartFile.class));
     }
 }

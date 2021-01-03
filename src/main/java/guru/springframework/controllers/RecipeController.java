@@ -4,10 +4,10 @@ import guru.springframework.commands.RecipeCommand;
 import guru.springframework.services.RecipeService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Controller
 public class RecipeController {
@@ -20,15 +20,13 @@ public class RecipeController {
 
     @GetMapping("/recipe/{id}/show")
     public String show(@PathVariable Long id, Model model) {
-        RecipeCommand recipe = recipeService.findById(id);
-        model.addAttribute("recipe", recipe);
+        model.addAttribute("recipe", recipeService.findById(id));
         return "recipe/show";
     }
 
     @GetMapping("/recipe/{id}/update")
     public String update(@PathVariable Long id, Model model) {
-        RecipeCommand recipe = recipeService.findById(id);
-        model.addAttribute("recipe", recipe);
+        model.addAttribute("recipe", recipeService.findById(id));
         return "recipe/new";
     }
 
@@ -36,6 +34,18 @@ public class RecipeController {
     public String delete(@PathVariable Long id) {
         recipeService.deleteById(id);
         return "redirect:/";
+    }
+
+    @GetMapping("/recipe/{id}/image")
+    public String showUploadImageView(final @PathVariable Long id, final Model model) {
+        model.addAttribute("recipe", recipeService.findById(id));
+        return "recipe/uploadimage";
+    }
+
+    @PostMapping("/recipe/{id}/image")
+    public String uploadImage(@PathVariable Long id, @RequestParam("imagefile") MultipartFile file) throws IOException {
+        recipeService.uploadImageById(id, file);
+        return "redirect:/recipe/" + id + "/show";
     }
 
     @GetMapping("/recipe/new")
