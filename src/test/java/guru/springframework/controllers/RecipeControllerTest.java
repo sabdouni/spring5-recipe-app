@@ -81,7 +81,22 @@ public class RecipeControllerTest {
 
         //Assert
         resultActions
+                .andExpect(status().isNotFound())
                 .andExpect(view().name("errors/404.html"))
+                .andExpect(model().attributeExists("exception"));
+    }
+
+    @Test
+    public void testShowRecipeViewRecipeIDFormatError() throws Exception {
+        //Arrange
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/notalong/show"));
+
+        //Assert
+        resultActions
+                .andExpect(status().isBadRequest())
+                .andExpect(view().name("errors/400.html"))
                 .andExpect(model().attributeExists("exception"));
     }
 
