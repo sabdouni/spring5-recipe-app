@@ -2,12 +2,16 @@ package guru.springframework.controllers;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.services.RecipeService;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Controller
 public class RecipeController {
@@ -46,6 +50,21 @@ public class RecipeController {
     public String uploadImage(@PathVariable Long id, @RequestParam("imagefile") MultipartFile file) throws IOException {
         recipeService.uploadImageById(id, file);
         return "redirect:/recipe/" + id + "/show";
+    }
+
+    @GetMapping("/recipe/{id}/showimage")
+    public void showImage(final @PathVariable Long id, final HttpServletResponse servletResponse) throws IOException {
+        RecipeCommand recipeCommand = recipeService.findById(id);
+        servletResponse.setContentType("image/jpeg");
+
+        byte[] imageBytes = new byte[recipeCommand.getImage().length];
+        int i = 0;
+        for (Byte b : recipeCommand.getImage()) {
+            imageBytes[i++] = b;
+        }
+
+        InputStream is = new ByteArrayInputStream(imageBytes);
+        IOUtils.copy(is, servletResponse.getOutputStream());
     }
 
     @GetMapping("/recipe/new")

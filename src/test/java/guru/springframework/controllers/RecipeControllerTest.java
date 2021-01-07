@@ -2,6 +2,7 @@ package guru.springframework.controllers;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.domain.Difficulty;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.services.RecipeService;
 import org.junit.Before;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -67,6 +69,19 @@ public class RecipeControllerTest {
         resultActions.andExpect(model().attributeExists("recipe"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe/show"));
+    }
+
+    @Test
+    public void testShowRecipeViewRecipeNotFound() throws Exception {
+        //Arrange
+        when(recipeService.findById(anyLong())).thenThrow(NotFoundException.class);
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/1/show"));
+
+        //Assert
+        resultActions
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -182,5 +197,33 @@ public class RecipeControllerTest {
         resultActions.andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/recipe/" + RECIPE_ID + "/show"));
         verify(recipeService, times(1)).uploadImageById(eq(RECIPE_ID), any(MultipartFile.class));
+    }
+
+    @Test
+    public void testShowRecipeImage() throws Exception {
+        //Arrange
+        String image = "fake image text";
+        Byte[] imageAsBytes = new Byte[image.getBytes().length];
+
+        int i = 0;
+
+        for (byte b : image.getBytes()) {
+            imageAsBytes[i++] = b;
+        }
+
+        RecipeCommand recipe = new RecipeCommand();
+        recipe.setId(RECIPE_ID);
+        recipe.setImage(imageAsBytes);
+
+        when(recipeService.findById(eq(RECIPE_ID))).thenReturn(recipe);
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(get("/recipe/" + RECIPE_ID + "/showimage"));
+
+        //Assert
+        MockHttpServletResponse servletResponse = resultActions.andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        assertEquals(imageAsBytes.length, servletResponse.getContentAsByteArray().length);
     }
 }
