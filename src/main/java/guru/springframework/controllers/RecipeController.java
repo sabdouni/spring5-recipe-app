@@ -87,11 +87,4 @@ public class RecipeController {
         model.addAttribute("exception", exception);
         return "errors/404.html";
     }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(NumberFormatException.class)
-    public String handleNumberFormatException(Exception exception, Model model) {
-        model.addAttribute("exception", exception);
-        return "errors/400.html";
-    }
 }
