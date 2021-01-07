@@ -83,7 +83,8 @@ public class RecipeController {
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
-    public String handleNotFound() {
+    public String handleNotFound(Exception exception, Model model) {
+        model.addAttribute("exception", exception);
         return "errors/404.html";
     }
 }

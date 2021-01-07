@@ -81,8 +81,8 @@ public class RecipeControllerTest {
 
         //Assert
         resultActions
-                .andExpect(status().isNotFound())
-                .andExpect(view().name("errors/404.html"));
+                .andExpect(view().name("errors/404.html"))
+                .andExpect(model().attributeExists("exception"));
     }
 
     @Test
