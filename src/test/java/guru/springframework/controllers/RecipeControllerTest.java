@@ -81,7 +81,8 @@ public class RecipeControllerTest {
 
         //Assert
         resultActions
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("errors/404.html"));
     }
 
     @Test
