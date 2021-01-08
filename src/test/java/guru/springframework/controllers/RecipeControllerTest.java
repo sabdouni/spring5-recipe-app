@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class RecipeControllerTest {
     public static final Long RECIPE_ID = 1L;
     public static final String RECIPE_DESCRIPTION = "How to Make Perfect Guacamole";
-    public static final Integer RECIPE_COOK_TIME = 0;
+    public static final Integer RECIPE_COOK_TIME = 1;
     public static final Integer RECIPE_PREP_TIME = 10;
     public static final Integer RECIPE_SERVINGS = 4;
     public static final Difficulty RECIPE_DIFFICULTY = Difficulty.EASY;
@@ -170,6 +170,27 @@ public class RecipeControllerTest {
         assertEquals(RECIPE_URL, requestCaptor.getValue().getUrl());
         assertEquals(RECIPE_DESCRIPTION, requestCaptor.getValue().getDirections());
         assertEquals(RECIPE_NOTES, requestCaptor.getValue().getNotes().getRecipeNotes());
+    }
+
+    @Test
+    public void testSaveOrUpdateRecipeValidationFailure() throws Exception {
+        //Arrange
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(RECIPE_ID);
+
+        when(recipeService.save(any(RecipeCommand.class))).thenReturn(recipeCommand);
+        ArgumentCaptor<RecipeCommand> requestCaptor = ArgumentCaptor.forClass(RecipeCommand.class);
+
+        //Act
+        ResultActions resultActions = mockMvc.perform(post("/recipe")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("description", RECIPE_DESCRIPTION));
+
+        //Assert
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(view().name("recipe/new"))
+                .andExpect(model().attributeExists("recipe"));
     }
 
     @Test
