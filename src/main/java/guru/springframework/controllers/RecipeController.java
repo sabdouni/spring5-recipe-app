@@ -78,9 +78,8 @@ public class RecipeController {
     }
 
     @PostMapping("/recipe")
-    public String saveOrUpdate(@Valid @ModelAttribute RecipeCommand recipeCommand, final BindingResult bindingResult, final Model model) {
+    public String saveOrUpdate(@Valid @ModelAttribute("recipe") RecipeCommand recipeCommand, final BindingResult bindingResult, final Model model) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("recipe", recipeCommand);
             return "recipe/new";
         }
         RecipeCommand savedRecipeCommand = recipeService.save(recipeCommand);
