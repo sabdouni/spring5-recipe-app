@@ -5,16 +5,18 @@ import guru.springframework.repositories.CategoryRepository;
 import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 @Component
+@Profile("default")
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
 
     private final RecipeRepository recipeRepository;
-    private final UnitOfMeasureRepository  unitOfMeasureRepository;
+    private final UnitOfMeasureRepository unitOfMeasureRepository;
     private final CategoryRepository categoryRepository;
 
     public RecipeBootstrap(RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository, CategoryRepository categoryRepository) {
@@ -33,7 +35,7 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         //Categories
         Category american = categoryRepository.findByDescription("American").get();
-        Category mexican =  categoryRepository.findByDescription("Mexican").get();
+        Category mexican = categoryRepository.findByDescription("Mexican").get();
 
         //Guacamole
         Recipe guacamole = new Recipe();
